@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (c) 2014, Team 3710 and Team 256
+# Copyright (c) 2014, Team 3710 and Team 254
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without

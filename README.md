@@ -46,7 +46,7 @@ I have provided two ways of running it:
 # GPLv3 license stuff
 
  
-Copyright (c) 2014, Team 3710 and Team 256 All rights reserved.
+Copyright (c) 2014, Team 3710 and Team 254 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
