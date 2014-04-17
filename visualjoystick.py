@@ -140,13 +140,13 @@ def writeParams( args ) :
 	global button_minH, button_maxH, button_noiseFilterSize
 	global teamNo
 	
-	joystick_minH = cv2.getTrackbarPos("joystick_minH", "Calibrate Joystick")
-	joystick_maxH = cv2.getTrackbarPos("joystick_maxH", "Calibrate Joystick")
-	joystick_noiseFilterSize = cv2.getTrackbarPos("joystick size of noise filter", "Calibrate Joystick")
+	joystick_minH = cv2.getTrackbarPos("minH_joystick", "Calibrate Joystick")
+	joystick_maxH = cv2.getTrackbarPos("maxH_joystick", "Calibrate Joystick")
+	joystick_noiseFilterSize = cv2.getTrackbarPos("size of noise filter joystick", "Calibrate Joystick")
 	
-	button_minH = cv2.getTrackbarPos( "button_minH", "Calibrate Button")
-	button_maxH = cv2.getTrackbarPos( "button_maxH", "Calibrate Button")
-	button_noiseFilterSize = cv2.getTrackbarPos( "button size of noise filter", "Calibrate Button")
+	button_minH = cv2.getTrackbarPos( "minH_button", "Calibrate Button")
+	button_maxH = cv2.getTrackbarPos( "maxH_button", "Calibrate Button")
+	button_noiseFilterSize = cv2.getTrackbarPos( "size of noise filter button", "Calibrate Button")
 	
 	params = {}
 	params["joystick_minH"] = joystick_minH
@@ -222,14 +222,14 @@ def run( ) :
 		
 	# create the trackbars (aka sliders)
 	cv2.namedWindow("Calibrate Joystick", 1)
-	cv2.createTrackbar( "joystick_minH", "Calibrate Joystick", joystick_minH, 180, writeParams)
-	cv2.createTrackbar( "joystick_maxH", "Calibrate Joystick", joystick_maxH, 180, writeParams)
-	cv2.createTrackbar( "joystick size of noise filter", "Calibrate Joystick", joystick_noiseFilterSize, 25, writeParams)
+	cv2.createTrackbar( "minH_joystick", "Calibrate Joystick", joystick_minH, 180, writeParams)
+	cv2.createTrackbar( "maxH_joystick", "Calibrate Joystick", joystick_maxH, 180, writeParams)
+	cv2.createTrackbar( "size of noise filter joystick", "Calibrate Joystick", joystick_noiseFilterSize, 25, writeParams)
     
 	cv2.namedWindow("Calibrate Button", 1)
-	cv2.createTrackbar( "button_minH", "Calibrate Button", button_minH, 180, writeParams)
-	cv2.createTrackbar( "button_maxH", "Calibrate Button", button_maxH, 180, writeParams)
-	cv2.createTrackbar( "button size of noise filter", "Calibrate Button", button_noiseFilterSize, 25, writeParams)
+	cv2.createTrackbar( "minH_button", "Calibrate Button", button_minH, 180, writeParams)
+	cv2.createTrackbar( "maxH_button", "Calibrate Button", button_maxH, 180, writeParams)
+	cv2.createTrackbar( "size of noise filter button", "Calibrate Button", button_noiseFilterSize, 25, writeParams)
 	cv2.waitKey(5);
 	
 	WINDOW_NAME = "Visual Joystick for Team "+teamNo
