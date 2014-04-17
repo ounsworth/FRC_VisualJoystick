@@ -30,37 +30,23 @@
 # ~~~ Visual Joystick ~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~
 #
-# This Python script uses your laptop's webcam and OpenCV to allow an operator to
-# signal which goal is hot during autonomous mode.  You can think of it as a poor
-# man's Kinect, but one that does not need a USB port, power supply, or special
-# hardware.
+# This Python script uses your laptop's webcam and OpenCV to get a 2-axis, 4-button 
+# joystick during autonomous mode. The values are sent to the cRIO and what you do
+# with it is up to you!
 #
-# Configure the script by following the instructions posted here:
-# https://github.com/Team254/CheesyVision
+# When you start the program you will need to enter your team number so we can find
+# the IP of your cRIO. You will then have to select two vision targets of distinct colours,
+# I used red and blue stress balls. It is important to pick something which will be
+# a distinct colour from the background. To calibrate your two vision targets use the two
+# calibration windows that should pop up. Use the minH and maxH sliders to select a range
+# of hue values to segment your target from the background. One of your targets will then
+# act as a two axis joystick, and the other will activate the four buttons at the bottom.
+# The values of your configuration are saved to the file 'parameters.yaml' so that they should
+# persist between runs. Note that hue is strongly effected by the lighting conditions of your
+# room, so you may need to adjust the values every time you change rooms, and *ESPECIALLY*
+# under the arena lights at the competition venue.
 #
-# Then, set your team number below and you are good to go!
-#
-# To use, run the script and see that there are three boxes overlayed on the webcam
-# image.  The top center box is for "calibration", and it constantly computes the
-# average color inside of the box as a reference.  The other two boxes are used for
-# signalling the hot goal.  Basically, if the left and right boxes are about the same
-# color as the calibration box, we assume the goal is hot.  If the color is different,
-# we assume the goal is not hot.  If you are wearing a colorful, solid shirt, you can
-# just use your hands - watch how the widget indicates what it sees as you move your
-# hands through the boxes.  Or, you might find that a brightly colored object that your
-# operator holds works better for you.  Before the match starts, hold up your hands, and
-# then drop the one that corresponds to the hot goal.  The information is then sent to
-# the cRIO.
-#
-# (We found that the "default hot" strategy works best, because it forces you to double
-#  check that the camera is working before the match.)
-#
-# There are 5 keys that you can use to tweak the performance of the app:
-#  1. Escape quits.
-#  2. W and S increment and decrement exposure (if your webcam supports this feature).
-#     This is very useful if you find the image looks too washed out.
-#  3. A and D increment and decrement the color threshold used to tell if the color is
-#     different.
+# To quit press 'esc' in the webcam window.
 #
 # Enjoy!
 import socket, time, copy
@@ -115,25 +101,29 @@ def detect( img, minH, maxH, noiseFilterSize, windowName ) :
 	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 	
 	# threshold the color
-	mask = cv2.inRange( hsv, np.array( [minH, minS, minV] ), np.array( [minH, minS, minV] ) )
+	mask = cv2.inRange( hsv, np.array( [minH, minS, minV], np.uint8 ), np.array( [maxH, maxS, maxV], np.uint8 ) )
 	
 	# noise filter
 	#cv.Smooth( mask, mask, cv.CV_MEDIAN, 2*noiseFilterSize+1);
-	mask = cv2.blur(mask, (2*noiseFilterSize+1, 2*noiseFilterSize+1) )
+	mask = cv2.medianBlur( mask,2*noiseFilterSize+1);
+	#kernel = np.ones((2*noiseFilterSize+1, 2*noiseFilterSize+1),np.uint8)
+	#mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+	#mask = cv2.boxFilter(mask, -1, (2*noiseFilterSize+1, 2*noiseFilterSize+1), normalize=True )
+	#mask = cv2.inRange( mask, 127, 255)
 	
-	cv2.imshow(windowName, np.array(mask) )
+	cv2.imshow(windowName, mask )
 	
 	# compute the centre of mass
 	# the basic idea is to the (x,y) coordinate by its binar {0,1} detected mask, then average them
 	# the numpy linear algebra (aka vectorization) makes this MUCH faster, but also harder to read
-	w,h = mask.shape
+	h,w = mask.shape
 	ys = np.array( range( h ) )
 	ys = np.tile( np.array( range(h) ), ( w, 1) ).transpose()
 	
 	xs = np.array( range( w ) )
 	xs = np.tile( np.array( range(w) ), ( h, 1) )
 	
-	npMask = np.array(mask).astype(float) / 255
+	npMask = mask.astype(float) / 255
 	
 	sum = np.sum(npMask)
 	if (sum / (w*h) < minSize) :
@@ -232,13 +222,13 @@ def run( ) :
 		
 	# create the trackbars (aka sliders)
 	cv2.namedWindow("Calibrate Joystick", 1)
-	cv2.createTrackbar( "joystick_minH", "Calibrate Joystick", joystick_minH, 255, writeParams)
-	cv2.createTrackbar( "joystick_maxH", "Calibrate Joystick", joystick_maxH, 255, writeParams)
+	cv2.createTrackbar( "joystick_minH", "Calibrate Joystick", joystick_minH, 180, writeParams)
+	cv2.createTrackbar( "joystick_maxH", "Calibrate Joystick", joystick_maxH, 180, writeParams)
 	cv2.createTrackbar( "joystick size of noise filter", "Calibrate Joystick", joystick_noiseFilterSize, 25, writeParams)
     
 	cv2.namedWindow("Calibrate Button", 1)
-	cv2.createTrackbar( "button_minH", "Calibrate Button", button_minH, 255, writeParams)
-	cv2.createTrackbar( "button_maxH", "Calibrate Button", button_maxH, 255, writeParams)
+	cv2.createTrackbar( "button_minH", "Calibrate Button", button_minH, 180, writeParams)
+	cv2.createTrackbar( "button_maxH", "Calibrate Button", button_maxH, 180, writeParams)
 	cv2.createTrackbar( "button size of noise filter", "Calibrate Button", button_noiseFilterSize, 25, writeParams)
 	cv2.waitKey(5);
 	
