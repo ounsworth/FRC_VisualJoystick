@@ -65,7 +65,7 @@
 # Enjoy!
 import socket, time, copy
 import numpy as np
-import cv, cv2
+import cv2
 import Tkinter
 from Tkinter import *
 import yaml
@@ -115,17 +115,18 @@ def detect( img, minH, maxH, noiseFilterSize, windowName ) :
 	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 	
 	# threshold the color
-	mask = cv.fromarray( cv2.inRange( hsv, cv.Scalar(minH, minS, minV), cv.Scalar(maxH, maxS, maxV) ) )
+	mask = cv2.inRange( hsv, np.array( [minH, minS, minV] ), np.array( [minH, minS, minV] ) )
 	
 	# noise filter
-	cv.Smooth( mask, mask, cv.CV_MEDIAN, 2*noiseFilterSize+1);
+	#cv.Smooth( mask, mask, cv.CV_MEDIAN, 2*noiseFilterSize+1);
+	mask = cv2.blur(mask, (2*noiseFilterSize+1, 2*noiseFilterSize+1) )
 	
 	cv2.imshow(windowName, np.array(mask) )
 	
 	# compute the centre of mass
 	# the basic idea is to the (x,y) coordinate by its binar {0,1} detected mask, then average them
 	# the numpy linear algebra (aka vectorization) makes this MUCH faster, but also harder to read
-	w,h = cv.GetSize(mask)
+	w,h = mask.shape
 	ys = np.array( range( h ) )
 	ys = np.tile( np.array( range(h) ), ( w, 1) ).transpose()
 	
@@ -230,19 +231,19 @@ def run( ) :
 	top.destroy()
 		
 	# create the trackbars (aka sliders)
-	cv.NamedWindow("Calibrate Joystick", 1)
-	cv.CreateTrackbar( "joystick_minH", "Calibrate Joystick", joystick_minH, 255, writeParams)
-	cv.CreateTrackbar( "joystick_maxH", "Calibrate Joystick", joystick_maxH, 255, writeParams)
-	cv.CreateTrackbar( "joystick size of noise filter", "Calibrate Joystick", joystick_noiseFilterSize, 25, writeParams)
+	cv2.namedWindow("Calibrate Joystick", 1)
+	cv2.createTrackbar( "joystick_minH", "Calibrate Joystick", joystick_minH, 255, writeParams)
+	cv2.createTrackbar( "joystick_maxH", "Calibrate Joystick", joystick_maxH, 255, writeParams)
+	cv2.createTrackbar( "joystick size of noise filter", "Calibrate Joystick", joystick_noiseFilterSize, 25, writeParams)
     
-	cv.NamedWindow("Calibrate Button", 1)
-	cv.CreateTrackbar( "button_minH", "Calibrate Button", button_minH, 255, writeParams)
-	cv.CreateTrackbar( "button_maxH", "Calibrate Button", button_maxH, 255, writeParams)
-	cv.CreateTrackbar( "button size of noise filter", "Calibrate Button", button_noiseFilterSize, 25, writeParams)
-	cv.WaitKey(5);
+	cv2.namedWindow("Calibrate Button", 1)
+	cv2.createTrackbar( "button_minH", "Calibrate Button", button_minH, 255, writeParams)
+	cv2.createTrackbar( "button_maxH", "Calibrate Button", button_maxH, 255, writeParams)
+	cv2.createTrackbar( "button size of noise filter", "Calibrate Button", button_noiseFilterSize, 25, writeParams)
+	cv2.waitKey(5);
 	
 	WINDOW_NAME = "Visual Joystick for Team "+teamNo
-	cv.NamedWindow(WINDOW_NAME, 1)
+	cv2.namedWindow(WINDOW_NAME, 1)
 	
 	writeParams( 0 )
 
@@ -384,7 +385,7 @@ def run( ) :
 				connected = False
 
 		# Capture a keypress.
-		key = cv.WaitKey(10) & 255
+		key = cv2.waitKey(10) & 255
 
 		# Escape key.
 		if key == 27:
