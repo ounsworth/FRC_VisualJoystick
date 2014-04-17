@@ -29,9 +29,6 @@ class VisualJoystick implements Runnable {
 	/** Joystick Variables **/
 	private float x_axis, y_axis;
 	private boolean btn1, btn2, btn3, btn4;
-	
-	/** just to make it thread-safe since the socket server is running it its own thread **/
-	private Semaphore mutex = new Semaphore(1);
 
 
 	/** 
@@ -44,45 +41,29 @@ class VisualJoystick implements Runnable {
 	 *     // ignore
 	 **/
 	public float getX() {
-		mutex.acquire();
 		float var = x_axis;
-		mutex.release();
 		return var;
 	}
 
 	public float getY() {
-		mutex.acquire();
 		float var = y_axis;
-		mutex.release();
 		return var;
 	}
 
 	public boolean getButton1(){
-		mutex.acquire();
-		boolean var = btn1;
-		mutex.release();
-		return var;
+		return btn1;
 	}
 
 	public boolean getButton2(){
-		mutex.acquire();
-		boolean var = btn2;
-		mutex.release();
-		return var;
+		return btn2;
 	}
 	
 	public boolean getButton3(){
-		mutex.acquire();
-		boolean var = btn3;
-		mutex.release();
-		return var;
+		return btn3;
 	}
 	
 	public boolean getButton4(){
-		mutex.acquire();
-		boolean var = btn4;
-		mutex.release();
-		return var;
+		return btn4;
 	}
 
 	public void start() {
@@ -113,6 +94,9 @@ class VisualJoystick implements Runnable {
 	private Vector connections_;
 	double lastHeartbeatTime_ = -1;
 	private boolean listening_ = true;
+	
+	/** just to make it thread-safe since the socket server is running multiple threads **/
+	private Semaphore mutex = new Semaphore(1);
 	
 	public static VisualJoystick getInstance() {
       if (instance_ == null) {

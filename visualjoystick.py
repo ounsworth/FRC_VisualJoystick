@@ -106,10 +106,6 @@ def detect( img, minH, maxH, noiseFilterSize, windowName ) :
 	# noise filter
 	#cv.Smooth( mask, mask, cv.CV_MEDIAN, 2*noiseFilterSize+1);
 	mask = cv2.medianBlur( mask,2*noiseFilterSize+1);
-	#kernel = np.ones((2*noiseFilterSize+1, 2*noiseFilterSize+1),np.uint8)
-	#mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-	#mask = cv2.boxFilter(mask, -1, (2*noiseFilterSize+1, 2*noiseFilterSize+1), normalize=True )
-	#mask = cv2.inRange( mask, 127, 255)
 	
 	cv2.imshow(windowName, mask )
 	
@@ -397,7 +393,6 @@ def main():
 	top.title("FRC Visual Joystick")
 	top.resizable(0, 0)
 	top.geometry(("%dx%d")%(250,100))
-	top.protocol("WM_DELETE_WINDOW", exit)
 
 	instructLbl = Label(top, text="Team No.")
 	instructLbl.grid(row=0, sticky=N+E+W+S)
